@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JUEGO MATEMATICO</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1e1e2f;
+            background-image: url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            touch-action: manipulation;
+            overflow-x: hidden;
+        }
+        
+        .main-container {
+            background-color: rgba(30, 30, 47, 0.85);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            max-width: 800px;
+            width: 90%;
+        }
+        
+        h1 {
+            color: #00ffff;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            font-size: 2.5em;
+            background: linear-gradient(90deg, #00b0ff, #00ffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            padding: 10px;
+        }
+        
+        .math-icon {
+            width: 80px;
+            height: 80px;
+            margin: 10px;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+        
+        .math-icon:hover {
+            transform: scale(1.1);
+            opacity: 1;
+        }
+        
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #00b0ff, #0066ff);
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 176, 255, 0.3);
+            min-width: 250px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 176, 255, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0));
+            transform: rotate(30deg);
+            transition: all 0.3s ease;
+        }
+        
+        button:hover::after {
+            left: 100%;
+        }
+        
+        #gameContainer {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            display: none;
+            position: relative;
+            background-color: rgba(30, 30, 47, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        #questionText {
+            color: #ffffff;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            min-height: 2.5em;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #00b0ff;
+        }
+        
+        canvas {
+            background-color: #222;
+            border: 4px solid #00ffff;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            aspect-ratio: 5/4;
+            touch-action: none;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+        
+        .joystick-container {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 100px;
+            height: 100px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            display: none;
+            z-index: 100;
+            border: 2px solid rgba(0, 176, 255, 0.5);
+        }
+        
+        .joystick {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: rgba(0, 176, 255, 0.7);
+            border-radius: 50%;
+            top: 25px;
+            left: 25px;
+            touch-action: none;
+            box-shadow: 0 0 10px rgba(0, 176, 255, 0.5);
+        }
+        
+        .answer-zone {
+            position: absolute;
+            border: 2px dashed rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .icons-row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        .retry-btn {
+            background: linear-gradient(135deg, #ff6b00, #ff0066);
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .retry-btn:hover {
+            box-shadow: 0 8px 20px rgba(255, 0, 102, 0.4);
+        }
+        
+        .controls-info {
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 20px;
+            margin-top: 15px;
+            font-size: 0.9em;
+            border: 1px solid #00b0ff;
+            display: none;
+        }
+        
+        .controls-info span {
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 600px) {
+            button {
+                min-width: 200px;
+                font-size: 16px;
+                padding: 12px 25px;
+            }
+            
+            #questionText {
+                font-size: 1.2em;
+            }
+            
+            .joystick-container {
+                width: 80px;
+                height: 80px;
+                bottom: 20px;
+                left: 20px;
+            }
+            
+            .joystick {
+                width: 40px;
+                height: 40px;
+                top: 20px;
+                left: 20px;
+            }
+            
+            .math-icon {
+                width: 60px;
+                height: 60px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .controls-info {
+                font-size: 0.8em;
+                padding: 8px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <h1>Misiones Matemáticas: Aventura 2D</h1>
+        
+        <div class="icons-row">
+            <img src="https://cdn-icons-png.flaticon.com/512/190/190708.png" class="math-icon" alt="Trigonometría">
+            <img src="https://cdn-icons-png.flaticon.com/512/190/190699.png" class="math-icon" alt="Álgebra">
+            <img src="https://cdn-icons-png.flaticon.com/512/190/190696.png" class="math-icon" alt="Geometría">
+            <img src="https://cdn-icons-png.flaticon.com/512/190/190685.png" class="math-icon" alt="Cálculo">
+        </div>
+        
+        <div class="button-container">
+            <button id="trigonometricBtn">Funciones Trigonométricas</button>
+            <button id="exponentialBtn">Funciones Exponenciales</button>
+        </div>
+    </div>
+    
+    <div id="gameContainer">
+        <h2 id="questionText"></h2>
+        <canvas id="gameCanvas"></canvas>
+        <div class="joystick-container" id="joystickContainer">
+            <div class="joystick" id="joystick"></div>
+        </div>
+        <div class="controls-info" id="controlsInfo">
+            Mueve al personaje con <span>el joystick</span> (en móvil) o <span>las flechas del teclado</span> (en computador)
+        </div>
+        <button class="retry-btn" id="retryBtn">Volver a Jugar</button>
+    </div>
+    
+    <script>
+        // Definición ampliada de preguntas para secundaria
+        const questions = {
+            trigonometrica: [
+                { 
+                    question: "¿Cuál es el valor de sen(90°)?", 
+                    correct: "1", 
+                    options: ["0", "1", "-1", "0.5"], 
+                    explanation: "El seno de 90° es igual a 1 en el círculo unitario.",
+                    difficulty: 1
+                },
+                { 
+                    question: "¿Cuál es el valor de cos(0°)?", 
+                    correct: "1", 
+                    options: ["0", "1", "-1", "0.5"], 
+                    explanation: "El coseno de 0° es igual a 1 en el círculo unitario.",
+                    difficulty: 1
+                },
+                { 
+                    question: "¿Cuál es el período de la función sen(x)?", 
+                    correct: "2π", 
+                    options: ["π", "2π", "π/2", "4π"], 
+                    explanation: "La función seno tiene un período de 2π radianes.",
+                    difficulty: 2
+                },
+                { 
+                    question: "¿Qué ángulo tiene el mismo valor de seno que 30°?", 
+                    correct: "150°", 
+                    options: ["60°", "120°", "150°", "210°"], 
+                    explanation: "sen(30°) = sen(150°) por simetría en el círculo unitario.",
+                    difficulty: 2
+                },
+                { 
+                    question: "¿Cuál es la identidad trigonométrica fundamental?", 
+                    correct: "sen²θ + cos²θ = 1", 
+                    options: ["sen²θ + cos²θ = 1", "tanθ = senθ/cosθ", "1 + tan²θ = sec²θ", "sen(2θ) = 2senθcosθ"], 
+                    explanation: "Esta es la identidad pitagórica fundamental en trigonometría.",
+                    difficulty: 3
+                },
+                { 
+                    question: "¿Qué valor tiene tan(45°)?", 
+                    correct: "1", 
+                    options: ["0", "√2/2", "1", "√3"], 
+                    explanation: "tan(45°) = sen(45°)/cos(45°) = (√2/2)/(√2/2) = 1",
+                    difficulty: 2
+                },
+                { 
+                    question: "¿Cuál es la amplitud de y = 3sen(x)?", 
+                    correct: "3", 
+                    options: ["1", "2", "3", "2π"], 
+                    explanation: "La amplitud es el coeficiente que multiplica a la función seno.",
+                    difficulty: 2
+                },
+                { 
+                    question: "¿Qué función es impar (simétrica al origen)?", 
+                    correct: "sen(x)", 
+                    options: ["sen(x)", "cos(x)", "tan(x)", "sec(x)"], 
+                    explanation: "sen(-x) = -sen(x), lo que la define como función impar.",
+                    difficulty: 3
+                },
+                { 
+                    question: "¿Cuál es el valor de cos(π/3)?", 
+                    correct: "1/2", 
+                    options: ["√2/2", "1/2", "√3/2", "0"], 
+                    explanation: "π/3 radianes equivalen a 60° y cos(60°) = 1/2.",
+                    difficulty: 2
+                },
+                { 
+                    question: "¿Qué relación hay entre sen(θ) y cos(90°-θ)?", 
+                    correct: "Son iguales", 
+                    options: ["Son iguales", "Son opuestos", "No hay relación", "Uno es el inverso del otro"], 
+                    explanation: "sen(θ) = cos(90°-θ), son cofunciones.",
+                    difficulty: 3
+                }
+            ],
+            exponencial: [
+                { 
+                    question: "¿Cuál es el resultado de 2^3?", 
+                    correct: "8", 
+                    options: ["6", "8", "9", "4"], 
+                    explanation: "2 elevado a la 3 es 2×2×2 = 8.",
+                    difficulty: 1
+                },
+                { 
+                    question: "¿Qué representa la función y = e^x?", 
+                    correct: "Una exponencial", 
+                    options: ["Una recta", "Una parábola", "Una exponencial", "Una hipérbola"], 
+                    explanation: "y = e^x es la función exponencial natural.",
+                    difficulty: 2
+                },
+                { 
+                    question: "¿Cuál es el valor de e^0?", 
+                    correct: "1", 
+                    options: ["0", "1", "e", "∞"], 
+                    explanation: "Cualquier número elevado a 0 es igual a 1.",
+                    difficulty: 1
+                },
+                { 
+                    question: "¿Qué forma tiene la gráfica de y = 2^x?", 
+                    correct: "Creciente de izquierda a derecha", 
+                    options: ["Una recta", "Creciente de izquierda a derecha", "Decreciente de izquierda a derecha", "Una parábola"], 
+                    explanation: "Las funciones exponenciales con base >1 son crecientes.",
+                    difficulty: 2
+                },
+                { 
+                    question: "¿Cuál es la inversa de y = e^x?", 
+                    correct: "ln(x)", 
+                    options: ["log(x)", "ln(x)", "x^e", "1/e^x"], 
+                    explanation: "La función logaritmo natural es la inversa de la exponencial.",
+                    difficulty: 3
+                },
+                { 
+                    question: "¿Qué propiedad tiene e^(a+b)?", 
+                    correct: "e^a · e^b", 
+                    options: ["e^a + e^b", "e^a · e^b", "e^(a·b)", "No se puede simplificar"], 
+                    explanation: "Propiedad de exponentes: e^(a+b) = e^a · e^b.",
+                    difficulty: 2
+                },
+                { 
+                    question: "¿Cuál es la derivada de e^x?", 
+                    correct: "e^x", 
+                    options: ["0", "e^x", "x·e^(x-1)", "ln(x)"], 
+                    explanation: "La función e^x es única porque es igual a su propia derivada.",
+                    difficulty: 3
+                },
+                { 
+                    question: "¿Qué valor tiene ln(1)?", 
+                    correct: "0", 
+                    options: ["0", "1", "e", "No existe"], 
+                    explanation: "ln(1) = 0 porque e^0 = 1.",
+                    difficulty: 2
+                },
+                { 
+                    question: "¿Cómo se expresa 4^x en base e?", 
+                    correct: "e^(x·ln4)", 
+                    options: ["e^(4x)", "e^(x·ln4)", "4·e^x", "ln(4^x)"], 
+                    explanation: "a^x = e^(x·lna) por cambio de base exponencial.",
+                    difficulty: 3
+                },
+                { 
+                    question: "¿Qué le ocurre a e^x cuando x tiende a -∞?", 
+                    correct: "Tiende a 0", 
+                    options: ["Tiende a 0", "Tiende a -∞", "Tiende a 1", "Tiende a e"], 
+                    explanation: "El límite de e^x cuando x→-∞ es 0.",
+                    difficulty: 2
+                }
+            ]
+        };
+
+        // Variables del juego
+        let currentCategory = '';
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let gameActive = false;
+        let player = { x: 0, y: 0, size: 20, speed: 3 };
+        let answerZones = [];
+        let joystickActive = false;
+        let joystickAngle = 0;
+        let joystickPower = 0;
+        let joystickStartX = 0;
+        let joystickStartY = 0;
+        let keysPressed = {};
+
+        // Elementos del DOM
+        const gameContainer = document.getElementById('gameContainer');
+        const questionText = document.getElementById('questionText');
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const trigBtn = document.getElementById('trigonometricBtn');
+        const expBtn = document.getElementById('exponentialBtn');
+        const joystickContainer = document.getElementById('joystickContainer');
+        const joystick = document.getElementById('joystick');
+        const retryBtn = document.getElementById('retryBtn');
+        const mainContainer = document.querySelector('.main-container');
+        const controlsInfo = document.getElementById('controlsInfo');
+
+        // Inicialización del juego
+        function initGame() {
+            setupCanvas();
+            
+            trigBtn.addEventListener('click', () => startGame('trigonometrica'));
+            expBtn.addEventListener('click', () => startGame('exponencial'));
+            retryBtn.addEventListener('click', resetGame);
+            
+            setupJoystick();
+            setupKeyboardControls();
+            
+            // Iniciar bucle del juego
+            requestAnimationFrame(gameLoop);
+        }
+
+        function setupCanvas() {
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = 500 * dpr;
+            canvas.height = 400 * dpr;
+            ctx.scale(dpr, dpr);
+            canvas.style.width = '500px';
+            canvas.style.height = '400px';
+        }
+
+        function setupJoystick() {
+            joystick.addEventListener('touchstart', handleJoystickStart);
+            joystick.addEventListener('mousedown', handleJoystickStart);
+            document.addEventListener('touchmove', handleJoystickMove);
+            document.addEventListener('mousemove', handleJoystickMove);
+            document.addEventListener('touchend', handleJoystickEnd);
+            document.addEventListener('mouseup', handleJoystickEnd);
+        }
+
+        function setupKeyboardControls() {
+            document.addEventListener('keydown', (e) => {
+                keysPressed[e.key] = true;
+            });
+            
+            document.addEventListener('keyup', (e) => {
+                keysPressed[e.key] = false;
+            });
+        }
+
+        function handleJoystickStart(e) {
+            e.preventDefault();
+            joystickActive = true;
+            const rect = joystickContainer.getBoundingClientRect();
+            joystickStartX = rect.left + rect.width / 2;
+            joystickStartY = rect.top + rect.height / 2;
+            updateJoystickPosition(e);
+        }
+
+        function handleJoystickMove(e) {
+            if (!joystickActive) return;
+            e.preventDefault();
+            updateJoystickPosition(e);
+        }
+
+        function handleJoystickEnd(e) {
+            if (!joystickActive) return;
+            e.preventDefault();
+            joystickActive = false;
+            joystickPower = 0;
+            joystick.style.transform = 'translate(0, 0)';
+        }
+
+        function updateJoystickPosition(e) {
+            const clientX = e.clientX || e.touches[0].clientX;
+            const clientY = e.clientY || e.touches[0].clientY;
+            
+            const deltaX = clientX - joystickStartX;
+            const deltaY = clientY - joystickStartY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            
+            const maxDistance = joystickContainer.offsetWidth / 2;
+            joystickPower = Math.min(distance / maxDistance, 1);
+            
+            if (distance > 0) {
+                joystickAngle = Math.atan2(deltaY, deltaX);
+                
+                const limitedDistance = Math.min(distance, maxDistance);
+                const joystickX = Math.cos(joystickAngle) * limitedDistance;
+                const joystickY = Math.sin(joystickAngle) * limitedDistance;
+                
+                joystick.style.transform = `translate(${joystickX}px, ${joystickY}px)`;
+            }
+        }
+
+        function startGame(category) {
+            currentCategory = category;
+            currentQuestionIndex = 0;
+            score = 0;
+            gameActive = true;
+            mainContainer.style.display = 'none';
+            gameContainer.style.display = 'block';
+            joystickContainer.style.display = 'block';
+            controlsInfo.style.display = 'block';
+            retryBtn.style.display = 'none';
+            
+            // Posición inicial del jugador
+            player.x = canvas.width / 2 / (window.devicePixelRatio || 1);
+            player.y = canvas.height / 2 / (window.devicePixelRatio || 1);
+            
+            shuffleArray(questions[currentCategory]);
+            showQuestion();
+        }
+
+        function resetGame() {
+            currentQuestionIndex = 0;
+            score = 0;
+            gameActive = true;
+            joystickContainer.style.display = 'block';
+            controlsInfo.style.display = 'block';
+            retryBtn.style.display = 'none';
+            
+            player.x = canvas.width / 2 / (window.devicePixelRatio || 1);
+            player.y = canvas.height / 2 / (window.devicePixelRatio || 1);
+            
+            shuffleArray(questions[currentCategory]);
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (!gameActive || currentQuestionIndex >= questions[currentCategory].length) {
+                endGame();
+                return;
+            }
+
+            const questionData = questions[currentCategory][currentQuestionIndex];
+            questionText.textContent = questionData.question;
+            
+            createAnswerZones(questionData);
+        }
+
+        function createAnswerZones(questionData) {
+            answerZones = [];
+            const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
+            const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
+            
+            // Crear zonas de respuesta
+            questionData.options.forEach((option, index) => {
+                const zoneWidth = canvasWidth * 0.4;
+                const zoneHeight = 60;
+                
+                let x, y;
+                
+                if (index % 2 === 0) {
+                    x = canvasWidth * 0.1;
+                } else {
+                    x = canvasWidth * 0.5;
+                }
+                
+                if (index < 2) {
+                    y = canvasHeight * 0.2;
+                } else {
+                    y = canvasHeight * 0.6;
+                }
+                
+                answerZones.push({
+                    x: x,
+                    y: y,
+                    width: zoneWidth,
+                    height: zoneHeight,
+                    text: option,
+                    correct: option === questionData.correct
+                });
+            });
+        }
+
+        function handleKeyboardMovement() {
+            if (keysPressed['ArrowUp']) {
+                player.y -= player.speed;
+            }
+            if (keysPressed['ArrowDown']) {
+                player.y += player.speed;
+            }
+            if (keysPressed['ArrowLeft']) {
+                player.x -= player.speed;
+            }
+            if (keysPressed['ArrowRight']) {
+                player.x += player.speed;
+            }
+            
+            // Limitar al área del canvas
+            const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
+            const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
+            
+            player.x = Math.max(player.size, Math.min(canvasWidth - player.size, player.x));
+            player.y = Math.max(player.size, Math.min(canvasHeight - player.size, player.y));
+        }
+
+        function gameLoop() {
+            if (gameActive) {
+                update();
+                render();
+            }
+            requestAnimationFrame(gameLoop);
+        }
+
+        function update() {
+            // Movimiento con joystick
+            if (joystickActive && joystickPower > 0.2) {
+                player.x += Math.cos(joystickAngle) * player.speed * joystickPower;
+                player.y += Math.sin(joystickAngle) * player.speed * joystickPower;
+            }
+            
+            // Movimiento con teclado
+            handleKeyboardMovement();
+            
+            // Verificar colisión con zonas de respuesta
+            checkAnswerZoneCollision();
+        }
+
+        function checkAnswerZoneCollision() {
+            for (const zone of answerZones) {
+                if (player.x + player.size > zone.x && 
+                    player.x - player.size < zone.x + zone.width &&
+                    player.y + player.size > zone.y && 
+                    player.y - player.size < zone.y + zone.height) {
+                    
+                    const questionData = questions[currentCategory][currentQuestionIndex];
+                    
+                    if (zone.text === questionData.correct) {
+                        score += questionData.difficulty * 10;
+                        showFeedback("¡Correcto! " + questionData.explanation, '#00ffaa');
+                    } else {
+                        showFeedback(`Incorrecto. La respuesta correcta es: ${questionData.correct}. ${questionData.explanation}`, '#ff5555');
+                    }
+                    
+                    currentQuestionIndex++;
+                    setTimeout(() => {
+                        if (currentQuestionIndex < questions[currentCategory].length) {
+                            showQuestion();
+                        } else {
+                            endGame();
+                        }
+                    }, 2000);
+                    
+                    break;
+                }
+            }
+        }
+
+        function render() {
+            const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
+            const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
+            
+            // Limpiar canvas
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            
+            // Dibujar fondo del juego
+            ctx.fillStyle = '#222';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+            
+            // Dibujar patron de cuadrícula
+            ctx.strokeStyle = 'rgba(0, 176, 255, 0.1)';
+            ctx.lineWidth = 1;
+            const gridSize = 20;
+            for (let x = 0; x <= canvasWidth; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvasHeight);
+                ctx.stroke();
+            }
+            for (let y = 0; y <= canvasHeight; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvasWidth, y);
+                ctx.stroke();
+            }
+            
+            // Dibujar zonas de respuesta (todas en el mismo color)
+            answerZones.forEach(zone => {
+                ctx.strokeStyle = '#00b0ff';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.strokeRect(zone.x, zone.y, zone.width, zone.height);
+                ctx.setLineDash([]);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(zone.text, zone.x + zone.width / 2, zone.y + zone.height / 2 + 5);
+            });
+            
+            // Dibujar jugador
+            ctx.fillStyle = '#00b0ff';
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#00ffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Dibujar puntuación
+            ctx.fillStyle = 'white';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText(`Puntuación: ${score}`, 20, 30);
+            
+            // Dibujar progreso
+            ctx.textAlign = 'right';
+            ctx.fillText(`Pregunta: ${currentQuestionIndex + 1}/${questions[currentCategory].length}`, canvasWidth - 20, 30);
+        }
+
+        function showFeedback(message, color) {
+            gameActive = false;
+            joystickContainer.style.display = 'none';
+            const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
+            const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
+            
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+            
+            ctx.fillStyle = color;
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            
+            // Dividir el mensaje en líneas si es muy largo
+            const words = message.split(' ');
+            let lines = [];
+            let currentLine = words[0];
+            
+            for (let i = 1; i < words.length; i++) {
+                const testLine = currentLine + ' ' + words[i];
+                const metrics = ctx.measureText(testLine);
+                if (metrics.width < canvasWidth - 40) {
+                    currentLine = testLine;
+                } else {
+                    lines.push(currentLine);
+                    currentLine = words[i];
+                }
+            }
+            lines.push(currentLine);
+            
+            // Dibujar cada línea
+            lines.forEach((line, i) => {
+                ctx.fillText(line, canvasWidth / 2, canvasHeight / 2 - (lines.length * 12) + i * 25);
+            });
+        }
+
+        function endGame() {
+            gameActive = false;
+            joystickContainer.style.display = 'none';
+            controlsInfo.style.display = 'none';
+            retryBtn.style.display = 'block';
+            
+            const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
+            const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
+            
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`¡Juego terminado!`, canvasWidth / 2, canvasHeight / 2 - 30);
+            ctx.fillText(`Puntuación final: ${score}`, canvasWidth / 2, canvasHeight / 2);
+            ctx.fillText(`de ${questions[currentCategory].length * 20} puntos posibles`, canvasWidth / 2, canvasHeight / 2 + 30);
+            
+            // Mostrar porcentaje de aciertos
+            const percentage = Math.round((score / (questions[currentCategory].length * 20)) * 100);
+            ctx.fillStyle = percentage >= 70 ? '#00ffaa' : percentage >= 40 ? '#ffcc00' : '#ff5555';
+            ctx.font = '28px Arial';
+            ctx.fillText(`${percentage}% de aciertos`, canvasWidth / 2, canvasHeight / 2 + 70);
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
